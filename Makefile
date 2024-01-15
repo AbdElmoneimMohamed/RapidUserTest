@@ -18,7 +18,6 @@ restart:
 	make down; make up;
 
 asset:
-	$(SAIL) artisan ui adminlte
 	$(ASSETS_BUILD)
 
 # App ------------------------------------------------------------------------ #

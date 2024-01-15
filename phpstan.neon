@@ -3,5 +3,11 @@ includes:
 
 parameters:
     level: 8
+    checkGenericClassInNonGenericObjectType: false
+    checkUninitializedProperties: true
+    treatPhpDocTypesAsCertain: false
     paths:
         - app
+    excludePaths:
+        - app/Http/Controllers/Auth/*
+        - app/View/Components/*

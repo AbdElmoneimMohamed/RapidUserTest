@@ -4,36 +4,36 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
-use App\Models\Product;
-use App\Models\User;
+use App\Repositories\Categories\CategoryRepositoryInterface;
+use App\Repositories\Products\ProductsRepositoryInterface;
+use App\Shared\UserConfiguration;
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\Facades\Auth;
-use Webmozart\Assert\Assert;
 
-class ProductsController extends Controller
+final class ProductsController extends Controller
 {
-    private const MIN_ADULT_AGE = 18;
-    private const MAX_ADULT_AGE = 30;
+    public function __construct(
+        private readonly ProductsRepositoryInterface $productsRepository,
+        private readonly CategoryRepositoryInterface $categoryRepository,
+        private readonly UserConfiguration $userConfiguration
+    ) {
+    }
 
-    public function list(): view
+    public function list(): View
     {
-        $categoriesForAdult = Category::where('for_adult', '=', 1)->pluck('id')->toArray();
+        $categoriesForAdult = $this->categoryRepository->findAdultCategories()->toArray();
 
-        $user = Auth::getUser();
-
-        if ($user->age < self::MIN_ADULT_AGE || $user->age > self::MAX_ADULT_AGE) {
-            $products = Product::whereNotIn('category_id', $categoriesForAdult)->get();
+        if ($this->userConfiguration->isAdultUser()) {
+            $products = $this->productsRepository->findAll();
         } else {
-            $products = Product::all();
+            $products = $this->productsRepository->getProductForNotAdultUsers($categoriesForAdult);
         }
 
         return view('products.list', compact('products'));
     }
 
-    public function details($id): view
+    public function details(int $id): View
     {
-        $product = Product::find($id);
+        $product = $this->productsRepository->find($id);
 
         return view('products.show', compact('product'));
     }

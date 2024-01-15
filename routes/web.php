@@ -29,7 +29,7 @@ Route::middleware('auth')->group(function () {
 
 
     Route::get('/products', [ProductsController::class, 'list'])->name('products.list');
-    Route::get('/products/{id}', [ProductsController::class, 'details'])->name('products.details');
+    Route::get('/products/{id}', [ProductsController::class, 'details'])->name('products.details')->middleware(\App\Http\Middleware\EnsureTheProductForAdult::class);
 
 });
 
